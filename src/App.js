@@ -1,9 +1,8 @@
 import React, { useEffect, useRef, useState} from 'react';
-import gsap, { Power2 } from 'gsap';
+import gsap from 'gsap';
 import './App.css';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import SplitText from "gsap-trial/SplitText"
-
 
 
 gsap.registerPlugin(SplitText);
@@ -92,59 +91,45 @@ function App() {
 
 
 
-    const quoteRef = useRef(null);
+    const textRef = useRef(null);
 
     useEffect(() => {
-        const quote = quoteRef.current;
-        const splitText = new SplitText(quote, { type: 'words' });
-        const words = splitText.words;
-        const numWords = words.length;
+        const $quote = textRef.current;
+        const mySplitText = new SplitText($quote, { type: "words" });
+        const splitTextTimeline = gsap.timeline();
+        gsap.set($quote, { perspective: 400 });
+        gsap.set(mySplitText.words, { opacity: 0 });
+        const animateText = () => {
+            mySplitText.split({ type: "lines" });
+            splitTextTimeline.from(mySplitText.lines, {
+                duration: 0.3,
+                opacity: 0,
+                rotationX: -120,
+                force3D: true,
+                transformOrigin: "top center -150",
+                stagger: 0.1,
+            });
+        };
 
-        // Intro sequence
-        gsap.set(quote, { transformPerspective: 600, perspective: 300, transformStyle: 'preserve-3d', autoAlpha: 1 });
+        const combinedTimeline = gsap.timeline({
+            onComplete: () => {
+            },
+        });
 
-        const tl = gsap.timeline({ delay: 0.5, repeat: 10, repeatDelay: 1 });
+        ScrollTrigger.create({
+            trigger: $quote,
+            start: "top center",
+            onEnter: () => animateText(),
+            once: true,
+        });
+        combinedTimeline.add(splitTextTimeline);
 
-        for (let i = 0; i < numWords; i++) {
-            tl.from(words[i], { duration: 1.5, z: randomNumber(-500, 300), opacity: 0, rotationY: randomNumber(-40, 40), ease: Power2.easeOut }, Math.random() * 1.5);
-        }
-        tl.from(quote, { duration: tl.duration(), rotationY: 180, transformOrigin: '50% 75% 200', ease: Power2.easeOut }, 0);
-
-        // Randomly change z of each word, map opacity to z depth and rotate quote on y axis
-        for (let i = 0; i < numWords; i++) {
-            const z = randomNumber(-50, 50);
-            tl.to(words[i], { duration: 0.5, z, opacity: rangeToPercent(z, -50, 50), ease: Power2.easeOut }, 'pulse');
-        }
-        tl.to(quote, { duration: 0.5, rotationY: 20, ease: Power2.easeOut }, 'pulse');
-
-        // Randomly change z of each word, map opacity to z depth and rotate quote on xy axis
-        for (let i = 0; i < numWords; i++) {
-            const z = randomNumber(-100, 100);
-            tl.to(words[i], { duration: 0.5, z, opacity: rangeToPercent(z, -100, 100), ease: Power2.easeOut }, 'pulse2');
-        }
-        tl.to(quote, { duration: 0.5, rotationX: -35, rotationY: 0, ease: Power2.easeOut }, 'pulse2');
-
-        // Reset the quote to normal position
-        tl.to(words, { duration: 0.5, z: 0, opacity: 1, ease: Power2.easeOut }, 'reset');
-        tl.to(quote, { duration: 0.5, rotationY: 0, rotationX: 0, ease: Power2.easeOut }, 'reset');
-
-        // Add explode effect
-        tl.add('explode', '+=2');
-        for (let i = 0; i < numWords; i++) {
-            tl.to(words[i], { duration: 0.6, z: randomNumber(100, 500), opacity: 0, rotation: randomNumber(360, 720), rotationX: randomNumber(-360, 360), rotationY: randomNumber(-360, 360), ease: Power2.easeOut }, 'explode+=' + Math.random() * 0.2);
-        }
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+        return () => {
+            ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+            splitTextTimeline.clear().time(0);
+            mySplitText.revert();
+        };
     }, []);
-
-    // Helper functions
-    const randomNumber = (min, max) => {
-        return Math.floor(Math.random() * (1 + max - min) + min);
-    };
-
-    const rangeToPercent = (number, min, max) => {
-        return ((number - min) / (max - min));
-    };
 
     const imageRef = useRef(null);
     const topLeavesRef = useRef(null);
@@ -291,11 +276,11 @@ function App() {
                             <span className="big-ball"/>
                         </div>
                     </div>
-                    <p className="center-text desc-2" ref={quoteRef} id="quote">
-                        Immerse yourself in Chumbi Valley, an enchanting and mystical play-and-earn blockchain
-                        game with intriguing and adorable NFT creatures known as Chumbi. Explore the uncharted
-                        forest, start a farm, grow crops and craft special items with your Chumbi companions
-                        by your side, while earning crypto rewards.
+                    <p className="about-section__content__text desc-2 center-text" ref={textRef}>
+                        <span className="desc-2 color-white">Immerse yourself in Chumbi Valley, an enchanting and mystical play-and-earn blockchain</span>
+                        <span className="desc-2 color-white">game with intriguing and adorable NFT creatures known as Chumbi. Explore the uncharted</span>
+                        <span className="desc-2 color-white">forest, start a farm, grow crops and craft special items with your Chumbi companions</span>
+                        <span className="desc-2 color-white">by your side, while earning crypto rewards.</span>
                     </p>
                 </div>
                 <div className="about-section__image">

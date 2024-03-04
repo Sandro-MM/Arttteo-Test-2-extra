@@ -7,6 +7,9 @@ a,abbr,acronym,address,applet,article,aside,audio,b,big,blockquote,body,button,c
   vertical-align: initial
 }
 
+div {
+  font-size: medium
+}
 
 
 input {
@@ -750,16 +753,4 @@ span.anim-span {
 .pause {
   animation: none;
   background-image: url("/src/assets/blink_6.png");
-}
-#quote{
-  -webkit-transform: translate3d(0, 0, 0);
-  color:#dedede;
-  margin:50px auto;
-  width:800px;
-  visibility:hidden;
-}
-
-#quote div{
-  -webkit-font-smoothing: antialiased;
-  -moz-font-smoothing:antialiased;
 }
