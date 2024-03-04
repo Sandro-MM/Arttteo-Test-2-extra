@@ -2,10 +2,9 @@ import React, { useEffect, useRef, useState} from 'react';
 import gsap from 'gsap';
 import './App.css';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import SplitText from "gsap-trial/SplitText"
 
 
-gsap.registerPlugin(SplitText);
+
 gsap.registerPlugin(ScrollTrigger);
 
 function App() {
@@ -93,43 +92,7 @@ function App() {
 
     const textRef = useRef(null);
 
-    useEffect(() => {
-        const $quote = textRef.current;
-        const mySplitText = new SplitText($quote, { type: "words" });
-        const splitTextTimeline = gsap.timeline();
-        gsap.set($quote, { perspective: 400 });
-        gsap.set(mySplitText.words, { opacity: 0 });
-        const animateText = () => {
-            mySplitText.split({ type: "lines" });
-            splitTextTimeline.from(mySplitText.lines, {
-                duration: 0.3,
-                opacity: 0,
-                rotationX: -120,
-                force3D: true,
-                transformOrigin: "top center -150",
-                stagger: 0.1,
-            });
-        };
 
-        const combinedTimeline = gsap.timeline({
-            onComplete: () => {
-            },
-        });
-
-        ScrollTrigger.create({
-            trigger: $quote,
-            start: "top center",
-            onEnter: () => animateText(),
-            once: true,
-        });
-        combinedTimeline.add(splitTextTimeline);
-
-        return () => {
-            ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
-            splitTextTimeline.clear().time(0);
-            mySplitText.revert();
-        };
-    }, []);
 
     const imageRef = useRef(null);
     const topLeavesRef = useRef(null);
